@@ -1,16 +1,16 @@
 package iter
 
-type Iterator struct {
+type Iterator[T any] struct {
 	Len int
 
-	data [][]string
+	data [][]T
 	s    int // slice index cursor
 	i    int // slice element index cursor
 }
 
-func NewIterator(slices ...[]string) *Iterator {
+func NewIterator[T any](slices ...[]T) *Iterator[T] {
 	totalLen := 0
-	filledSlices := make([][]string, 0, len(slices))
+	filledSlices := make([][]T, 0, len(slices))
 
 	for _, slice := range slices {
 		l := len(slice)
@@ -20,7 +20,7 @@ func NewIterator(slices ...[]string) *Iterator {
 		}
 	}
 
-	return &Iterator{
+	return &Iterator[T]{
 		Len:  totalLen,
 		data: filledSlices,
 		s:    0,
@@ -28,7 +28,7 @@ func NewIterator(slices ...[]string) *Iterator {
 	}
 }
 
-func (iter *Iterator) Take() (v string, ok bool) {
+func (iter *Iterator[T]) Take() (v T, ok bool) {
 	// element is out of current slice bound
 	if iter.i > len(iter.data[iter.s])-1 {
 		iter.s++
@@ -36,7 +36,8 @@ func (iter *Iterator) Take() (v string, ok bool) {
 
 		// element is out of global bound
 		if iter.s > len(iter.data)-1 {
-			return "", false
+			var defaultValue T
+			return defaultValue, false
 		}
 	}
 
